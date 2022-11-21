@@ -5,13 +5,13 @@ import os
 
 year = ['2012','2013','2014','2015','2016','2017','2018','2019']
 year_test = ['2019']
-test_list = 'C:/Users/ks297/Desktop/AllRainDropUnetData/list_contest_Q18.txt'
+test_list = 'C:/Users/--/AllRainDropUnetData/list_contest_Q18.txt'
 # 테스트 리스트가 존재할 시 (단, 연도는 모두 동일해야한다 & year_test에 연도도 추가해야한다)
 # 테스트 리스트가 존재하지 않으면 문자열을 아무렇게나 바꾼다.
 
 
-predata_dir = 'C:/Users/ks297/Desktop/RDR_data/'                    # 전처리 전 데이터 위치
-save_dir = 'C:/Users/ks297/Desktop/AllRainDropUnetData/'            # 전처리 후 데이터 저장 위치 & 참조 위치
+predata_dir = 'C:/Users/--/RDR_data/'                    # 전처리 전 데이터 위치
+save_dir = 'C:/Users/--/AllRainDropUnetData/'            # 전처리 후 데이터 저장 위치 & 참조 위치
 
 
 def read_all_file(path):
