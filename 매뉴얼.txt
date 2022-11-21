@@ -121,6 +121,3 @@ AllRainDrop
         => print_top5behind() = TOP6-10 이미지 출력
         => print_top5behinddif() = TOP6-10 이미지 출력
 	
-
-[4. 연락처]
-최하영 : 010-6675-6988
