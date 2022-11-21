@@ -65,38 +65,6 @@ class Dataset(torch.utils.data.Dataset):
 
         return data
 
-# 데이터로더 잘 구현되었는지 확인
-# dataset_train = Dataset(data_dir='C:/Users/ks297/Desktop/AllRainDropUnet/data/train')
-# data = dataset_train.__getitem__(0) # 한 이미지 불러오기
-# input = data['input']
-# label = data['label']
-
-# # 불러온 이미지 시각화
-# plt.subplot(321)
-# plt.imshow(label.reshape(128,128), cmap='jet')
-# plt.title('label')
-
-# plt.subplot(323)
-# plt.imshow(input[0].reshape(128,128), cmap='jet')
-# plt.title('input1')
-
-# plt.subplot(324)
-# plt.imshow(input[1].reshape(128,128), cmap='jet')
-# plt.title('input2')
-
-# plt.subplot(325)
-# plt.imshow(input[2].reshape(128,128), cmap='jet')
-# plt.title('input3')
-
-# plt.subplot(326)
-# plt.imshow(input[3].reshape(128,128), cmap='jet')
-# plt.title('input4')
-
-
-# plt.show()
-
-
-# 트렌스폼 구현하기
 class ToTensor(object):
     def __call__(self, data):
         label, input = data['label'], data['input']
@@ -108,75 +76,22 @@ class ToTensor(object):
 
         return data
 
-class Normalization(object):
-    def __init__(self, mean=0.5, std=0.5):
-        self.mean = mean
-        self.std = std
 
-    def __call__(self, data):
-        label, input = data['label'], data['input']
-
-        input = (input - self.mean) / self.std
-
-        data = {'label': label, 'input': input}
-
-        return data
-
-class RandomFlip(object):
-    def __call__(self, data):
-        label, input = data['label'], data['input']
-
-        if np.random.rand() > 0.5:
-            label = np.fliplr(label)
-            input = np.fliplr(input)
-
-        if np.random.rand() > 0.5:
-            label = np.flipud(label)
-            input = np.flipud(input)
-
-        data = {'label': label, 'input': input}
-
-        return data
-
-
-# 트랜스폼 잘 구현되었는지 확인
-#transform = transforms.Compose([Normalization(mean=0.5, std=0.5), RandomFlip(), ToTensor()])
-# transform = transforms.Compose([RandomFlip(), ToTensor()])
-# dataset_train = Dataset(data_dir='C:/Users/ks297/Desktop/AllRainDropUnet/data/train', transform=transform)
-# data = dataset_train.__getitem__(0) # 한 이미지 불러오기
-# input = data['input']
-# label = data['label']
-
-# 불러온 이미지 시각화
-# plt.subplot(223)
-# plt.hist(label.flatten(), bins=20)
-# plt.title('label')
-
-# plt.subplot(224)
-# plt.hist(input.flatten(), bins=20)
-# plt.title('input')
-
-# plt.tight_layout()
-# plt.show()
-
-# 훈련 파라미터 설정하기
 lr = 0.0003
 batch_size = 12
 num_epoch = 25
 
-base_dir = 'C:/Users/ks297/Desktop/AllRainDropUnetData'
-data_dir = 'C:/Users/ks297/Desktop/AllRainDropUnetData/data'
-ckpt_dir = 'C:/Users/ks297/Desktop/AllRainDropUnetData/checkpoint/'
-log_dir = 'C:/Users/ks297/Desktop/AllRainDropUnetData/log'
-result_dir = 'C:/Users/ks297/Desktop/AllRainDropUnetData/result'
+base_dir = 'C:/Users/--/AllRainDropUnetData'
+data_dir = 'C:/Users/--/AllRainDropUnetData/data'
+ckpt_dir = 'C:/Users/--/AllRainDropUnetData/checkpoint/'
+log_dir = 'C:/Users/--/AllRainDropUnetData/log'
+result_dir = 'C:/Users/--/AllRainDropUnetData/result'
 load_model_epoch = 'model_epoch15.pth'
 
-# 훈련을 위한 Transform과 DataLoader
-transform = transforms.Compose([ToTensor()])
 
+transform = transforms.Compose([ToTensor()])
 dataset_train = Dataset(data_dir=data_dir+'/train', transform=transform)
 loader_train = DataLoader(dataset_train, batch_size=batch_size, shuffle=True, num_workers=8)
-
 # dataset_val = Dataset(data_dir=data_dir+'/validation', transform=transform)
 # loader_val = DataLoader(dataset_val, batch_size=batch_size, shuffle=False, num_workers=8)
 
@@ -253,17 +168,10 @@ d_scheduler = optimizer.lr_scheduler.LambdaLR(optimizer=d_optim,
 criterion = nn.BCELoss()
 
 
-# 그밖에 부수적인 variables 설정하기
 num_data_train = len(dataset_train)
 # num_data_val = len(dataset_val) 
-
 num_batch_train = np.ceil(num_data_train / batch_size)
 # num_batch_val = np.ceil(num_data_val / batch_size)
-
-# 그 밖에 부수적인 functions 설정하기
-# fn_tonumpy = lambda x: x.to('cpu').detach().numpy().transpose(0, 2, 3, 1)
-# fn_denorm = lambda x, mean, std: (x * std) + mean
-# fn_class = lambda x: 1.0 * (x > 0.5)
 
 # # Tensorboard 를 사용하기 위한 SummaryWriter 설정
 writer_train = SummaryWriter(log_dir=os.path.join(log_dir, 'train'))
@@ -341,14 +249,6 @@ def train():
                         plt.imsave(os.path.join(result_dir, 'trainpng', '%d_%d_TE_label.png' % (epoch,batch)), label[0].cpu().squeeze(),
                             cmap='jet',vmin=-2.5,vmax=2.5)
                         net.train()
-                    # Tensorboard 저장하기
-                # label = fn_tonumpy(label)
-                # input = fn_tonumpy(fn_denorm(input, mean=0.5, std=0.5))
-                # output = fn_tonumpy(fn_class(output))
-
-                # writer_train.add_image('label', label, num_batch_train * (epoch - 1) + batch, dataformats='NHWC')
-                # writer_train.add_image('input', input, num_batch_train * (epoch - 1) + batch, dataformats='NHWC')
-                # writer_train.add_image('output', output, num_batch_train * (epoch - 1) + batch, dataformats='NHWC')
 
             writer_train.add_scalar('gloss', np.mean(gloss_arr), epoch)
             writer_train.add_scalar('dloss', np.mean(dloss_arr), epoch)
@@ -373,19 +273,10 @@ def train():
             #         print("VALID: EPOCH %04d / %04d | BATCH %04d / %04d | LOSS %.4f" %
             #             (epoch, num_epoch, batch, num_batch_val, np.mean(loss_arr)))
 
-                    # Tensorboard 저장하기
-                    # label = fn_tonumpy(label)
-                    # input = fn_tonumpy(fn_denorm(input, mean=0.5, std=0.5))
-                    # output = fn_tonumpy(fn_class(output))
-
-                    # writer_val.add_image('label', label, num_batch_val * (epoch - 1) + batch, dataformats='NHWC')
-                    # writer_val.add_image('input', input, num_batch_val * (epoch - 1) + batch, dataformats='NHWC')
-                    # writer_val.add_image('output', output, num_batch_val * (epoch - 1) + batch, dataformats='NHWC')
             # writer_val.add_scalar('loss', np.mean(loss_arr), epoch)
 
             g_scheduler.step()
             d_scheduler.step() 
-
 
             # epoch 50마다 모델 저장하기
             if epoch % 5 == 0:
@@ -459,8 +350,8 @@ def test():
 
 if __name__ == '__main__':
     
-    # train()
+    train()
 
     test()
 
-    # CSI.print_csimean()
+    CSI.print_csimean()
