@@ -1,0 +1,126 @@
+[0. 개요]
+- 2012~2019년 6~9월 기간에 대한 1시간 간격의 한반도 기상레이더 합성자료(CAPPI, HSR) 데이터셋을 이용해서 1시간 뒤 강우량 예측
+- Unet을 기반으로 한 강우 예측 모델 제시
+
+[1. 환경]
+	HW
+	- Windows10
+	- RTX 3070ti x 1
+	SW
+	- conda 22.9.0
+	- python 3.9.12
+	- pytorch 1.12.1
+	- CUDA(cudatoolkit) 11.6.0
+	- cuDNN 8.0
+	- numpy 1.21.5
+	- torch-optimizer 0.3.0
+	- torchvision 0.13.1
+	- netCDF4 1.5.7		* 데이터파일형식(netCDF4) 읽기 위해 반드시 필요
+
+[2. 파일 저장 구조] (-는 폴더, :는 파일)
+AllRainDrop
+: list_contest_Q18.txt
+	= 테스트 리스트
+: 매뉴얼.txt
+	= 매뉴얼
+- RawData (하지만 서버에는 zip파일만 올리겠습니다)
+	- 2012
+		: 2012년 RawData
+	- 2013
+		: 2013년 RawData
+	- 2014
+		: 2014년 RawData
+	- 2015
+		: 2015년 RawData
+	- 2016
+		: 2016년 RawData
+	- 2017
+		: 2017년 RawData
+	- 2018
+		: 2018년 RawData
+	- 2019
+		: 2019년 RawData
+
+- Data
+	- checkpoint
+		: model_epoch10.pth
+	- data
+		- test
+			- input
+			- label
+		- test_image
+		- train
+			- input
+			- label
+		- val
+			- input
+			- label
+	- data_post
+		- 2012
+		- 2013
+		- 2014
+		- 2015
+		- 2016
+		- 2017
+		- 2018
+		- 2019
+	- log
+	- result
+		- numpy
+		- png
+		- trainpng
+	
+- Model
+	- layers
+		: AllRainDrop_test.py
+		: AllRainDrop_train.py
+		: Discriminator.py
+		: Generator.py
+		: Layer.py
+- Util
+	: DataProcessing.py
+	: CSI.py
+
+
+
+[3. 모델 실행 방법]
+	[Prepare]
+	1. RawData들을 연도별 폴더에 담아 RawData 폴더 안에 넣는다. (하지만 서버에는 zip파일만 올리겠습니다.)
+	2. Util - DataProcessing.py 파일을 실행 (ipynb로 실행하지 않는 것을 권장합니다.)
+		=> Processing : Data - data_post에 가공되어 저장이 되고
+		=> Labeling : data_post 폴더에서 꺼내어 Data - dataset - test&train&val - input&label 폴더에 데이터를 분류 저장한다.
+		=> test_image_save() : Data - dataset - test_image 폴더에 test data가 이미지화하여 저장된다.
+	
+	[Run]
+	Train.	Model - AllRainDrop_train.py 파일을 실행
+		=> Data - data - train - input/label 폴더에서 데이터를 load한다.
+		=> 이 때 Input은 [(T-4h, T-3h, T-2h, T-1h) 4프레임의 강우데이터 묶음] 한 파일이 입력되고
+		=> Output으로 (T) 1프레임의 예측 데이터가 출력된다.
+		=> 이를 관측 데이터 Label과 비교하여 Loss를 구하고 업데이트를 한다.
+		* 100 batch마다 Data - dataset - result - trainpng 폴더에 출력 이미지가 label과 함께 저장된다.
+		* (설정에 따라 validation 과정도 on/off 할 수 있다.)
+		* 5 epochs마다 Data - dataset - checkpoint 폴더에 모델이 저장된다.
+
+	Test.	Model - AllRainDrop_test.py 파일을 실행
+		=> Data - data - train - input&label 폴더에서 데이터를 load한다.
+		=> 이 때 Input은 [(T-4h, T-3h, T-2h, T-1h) 4프레임의 강우데이터 묶음] 한 파일이 입력되고
+		=> Output으로 (T) 1프레임의 예측 데이터가 출력된다.
+		* data - result - numpy&png 폴더에 각각 데이터와 이미지가 저장된다.
+
+	* 기존에 모델이 존재하여 Train 혹은 Test시에
+	  중간에 load_model_epoch = 'model_epoch10.pth'를 수정하고 주석으로 처리된 load줄을 주석해제하면
+	  Data - checkpoint에서 load_model_epoch에 해당하는 파일을 참조하여 모델을 load한다.
+	  
+
+	[Check]
+	CSI	Util - CSI.py 파일을 실행, 원하는 함수 주석해제 후 Run.
+		=> show_random() = 랜덤하게 5종류 사진 보기
+		=> print_csimean() = CSI 평균 구하기
+		=> print_top5()     = TOP5 이미지 출력
+		=> print_top5dif()  = TOP5 오차 이미지 출력
+        => print_top5behind() = TOP6-10 이미지 출력
+        => print_top5behinddif() = TOP6-10 이미지 출력
+	
+
+[4. 연락처]
+최하영 : 010-6675-6988
