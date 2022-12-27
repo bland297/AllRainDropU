@@ -5,4 +5,4 @@ DeepMind AI의 DGMR과 Unet에서 영감을 받고 참고하여 만든 프로젝
 This is a project inspired by and referenced by DeepMind AI's DGMR and Unet.
 (Referenced by https://github.com/hyungting/DGMR-pytorch )
 
-https://www.notion.so/1b610b5759074ac48b36e0d3f9e0ae0c
+https://deluxe-gatsby-485.notion.site/1b610b5759074ac48b36e0d3f9e0ae0c
